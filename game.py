@@ -123,14 +123,13 @@ class Game:
 
         return runs
 
-        def replay(self):
-            self.inning = 1
-            self.homeScore = 0
-            self.awayScore = 0
-            self.outs = 0
-            self.bases = [0,0,0]
-            self.display = baseDisplay.baseDisplay(team1, team2)
-            self.home = team.Team(team1, pitchers1)
-            self.away = team.Team(team2, pitchers2)
-            self.home.setOpponent(self.away)
-            self.away.setOpponent(self.home)
+    def replay(self):
+        self.inning = 1
+        self.homeScore = 0
+        self.awayScore = 0
+        self.outs = 0
+        self.bases = [0,0,0]
+        self.display.replay()
+        self.home.replay()
+        self.away.replay()
+        self.play()

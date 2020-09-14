@@ -57,14 +57,14 @@ class Menu:
         input()
         response = 'r'
         game.play()
-        while true:
+        while True:
             print("[r] to replay game")
             print("[p] to start new game")
             print("[q] to quit simulator")
             response = input()
             if response == "r":
                 game.replay()
-            elif response == "p" or response == "q"
+            elif response == "p" or response == "q":
                 break
         if response == 'p':
             self.startup()

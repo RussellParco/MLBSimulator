@@ -70,3 +70,12 @@ class baseDisplay:
         print("Home: %d" %(score[0]))
         print("Away: %d" %(score[1]))
         self.renderStats()
+
+    def replay(self):
+        self.bases=['O','O','O']
+        for player in self.stats[0].keys() :
+            for stat in self.stats[0][player].keys():
+                self.stats[0][player][stat] = 0
+        for player in self.stats[1].keys() :
+            for stat in self.stats[1][player].keys():
+                self.stats[1][player][stat] = 0

@@ -38,3 +38,6 @@ class Team:
     def setOpponent(self, opp):
         self.opponent = opp
         opp.newOpposingPitcher(opp.curr_pitcher)
+
+    def replay(self):
+        self.batPos = 0
