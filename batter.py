@@ -85,7 +85,7 @@ class Batter:
         num = random.random()
         outcome = 0
 
-        if num <=self.probs[0] :
+        if num <= self.probs[0] :
             outcome = 0
             print("walk")
         elif num <=self.probs[1] :
@@ -109,4 +109,4 @@ class Batter:
         else:
             outcome = -3
             print("strikeout")
-        return outcome
+        return {"name":self.name, "outcome":outcome}

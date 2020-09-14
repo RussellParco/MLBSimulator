@@ -11,7 +11,7 @@ class Game:
         self.awayScore = 0
         self.outs = 0
         self.bases = [0,0,0]
-        self.display = baseDisplay.baseDisplay()
+        self.display = baseDisplay.baseDisplay(team1, team2)
 
         #set avergae players
         response = requests.get("http://lookup-service-prod.mlb.com/json/named.team_hitting_season_leader_master.bam?season=2019&sort_order=%27desc%27&sort_column=%27avg%27&game_type=%27R%27&sport_code=%27mlb%27&recSP=1&recPP=50")
@@ -45,35 +45,40 @@ class Game:
         while self.inning <= 9 or self.homeScore == self.awayScore:
             self.playInning()
             self.inning += 1
-        print("Home: %d" %(self.homeScore))
-        print("Away: %d" %(self.awayScore))
+        self.display.finalStats([self.homeScore, self.awayScore])
 
     def playInning(self):
         print("INNING: %d" %(self.inning))
-        self.display.update(self.bases)
+        self.display.updateBases(self.bases)
         while self.outs < 3:
             result = self.away.atBat()
-            self.awayScore += self.moveRunners(result)
-            if result < 0:
+            self.awayScore += self.moveRunners(result, 1)
+            if result["outcome"] < 0:
                 self.outs += 1
+                if result["outcome"] == -3:
+                    self.display.updateStats(1, result["name"], "SO")
+                else:
+                    self.display.updateStats(1, result["name"], "PA")
         self.outs = 0
         self.bases =[0,0,0]
         if not(self.inning == 9 and self.homeScore > self.awayScore):
             print("BOTTOM HALF")
-            self.display.update(self.bases)
+            self.display.updateBases(self.bases)
             while self.outs < 3:
                 result = self.home.atBat()
-                if result < 0:
+                if result["outcome"] < 0:
                     self.outs += 1
-                self.homeScore += self.moveRunners(result)
+                    if result["outcome"] == -3:
+                        self.display.updateStats(0, result["name"], "SO")
+                    else:
+                        self.display.updateStats(0, result["name"], "PA")
+                self.homeScore += self.moveRunners(result, 0)
             self.outs = 0
             self.bases =[0,0,0]
-            print("Home: %d" %(self.homeScore))
-            print("Away: %d" %(self.awayScore))
 
-    def moveRunners(self, result):
+    def moveRunners(self, result, half):
         runs = 0
-        if result == 0:
+        if result["outcome"] == 0:
             if self.bases[0]:
                 if self.bases[1]:
                     if self.bases[2]:
@@ -81,34 +86,51 @@ class Game:
                     self.bases[2] = 1
                 self.bases[1] = 1
             self.bases[0] = 1
-            self.display.update(self.bases)
-        elif result == 1:
+            self.display.updateBases(self.bases)
+            self.display.updateStats(half, result["name"], "BB")
+        elif result["outcome"] == 1:
             runs = self.bases[1] + self.bases[2]
             self.bases[1] = self.bases[2] = 0
 
             if self.bases[0]:
                 self.bases[1] = 1
             self.bases[0] = 1
-            self.display.update(self.bases)
+            self.display.updateBases(self.bases)
+            self.display.updateStats(half, result["name"], "H")
 
-        elif result == 2:
+        elif result["outcome"]== 2:
             runs = self.bases[2] + self.bases[1]
             self.bases[2] = 0
             self.bases[1] = 1
             if self.bases[0] :
                 self.bases[2] = 1
                 self.bases[0] = 0
-            self.display.update(self.bases)
+            self.display.updateBases(self.bases)
+            self.display.updateStats(half, result["name"], "2B")
 
-        elif result == 3:
+        elif result["outcome"]== 3:
             runs = self.bases[2] + self.bases[1] + self.bases[0]
             self.bases[0] = self.bases[1] = 0
             self.bases[2] = 1
-            self.display.update(self.bases)
+            self.display.updateBases(self.bases)
+            self.display.updateStats(half, result["name"], "3B")
 
-        elif result == 4:
+        elif result["outcome"]== 4:
              runs = self.bases[2] + self.bases[1] + self.bases[0] + 1
              self.bases[0] = self.bases[1] = self.bases[2] = 0
-             self.display.update(self.bases)
+             self.display.updateBases(self.bases)
+             self.display.updateStats(half, result["name"],"HR")
 
         return runs
+
+        def replay(self):
+            self.inning = 1
+            self.homeScore = 0
+            self.awayScore = 0
+            self.outs = 0
+            self.bases = [0,0,0]
+            self.display = baseDisplay.baseDisplay(team1, team2)
+            self.home = team.Team(team1, pitchers1)
+            self.away = team.Team(team2, pitchers2)
+            self.home.setOpponent(self.away)
+            self.away.setOpponent(self.home)

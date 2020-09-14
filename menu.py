@@ -52,17 +52,19 @@ class Menu:
             self.team2.append(self.pickPlayer())
         print("Pick Away Team Pither")
         pitcher2 = self.pickPlayer()
-        print(self.team1)
         game = g.Game(self.team1, self.team2, [pitcher1], [pitcher2])
         print("Press Enter to Play:")
         input()
         response = 'r'
-        while response == 'r' :
-            game.play()
+        game.play()
+        while true:
             print("[r] to replay game")
             print("[p] to start new game")
             print("[q] to quit simulator")
             response = input()
-
+            if response == "r":
+                game.replay()
+            elif response == "p" or response == "q"
+                break
         if response == 'p':
             self.startup()
